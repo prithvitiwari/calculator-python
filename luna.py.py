@@ -1,0 +1,404 @@
+
+import speech_recognition as sr
+import pyttsx3
+import datetime
+import wikipedia
+import webbrowser
+import os
+import time
+import subprocess
+from ecapture import ecapture as ec
+import wolframalpha
+import json
+import requests
+import firebase
+
+
+engine=pyttsx3.init()
+voices=engine.getProperty('voices')
+engine.setProperty('voice',voices[1].id)#0=male,1=female
+
+def speak(text, rate=120):
+    engine.setProperty('rate', rate)
+    engine.say(text)
+    engine.runAndWait()
+
+
+def wishMe():
+    hour=datetime.datetime.now().hour
+    if hour>=0 and hour<12:
+        speak("Hello,Good Morning prithvi")
+        print("Hello,Good Morning prithvi")
+    elif hour>=12 and hour<18:
+        speak("Hello,Good Afternoon prithvi sir")
+        print("Hello,Good Afternoon sir")
+    else:
+        speak("Hello,Good Evening sir")
+        print("Hello,Good Evening sir")
+
+def takeCommand():
+    r=sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        audio=r.listen(source)
+
+        try:
+            statement=r.recognize_google(audio,language='en-gb')
+            print(f"user said:{statement}\n")
+
+        except Exception as e:
+            speak("Pardon me, please say that again")
+            return "None"
+
+            
+        return statement
+
+print("Loading your AI personal assistant. 'luna")
+speak("Loading your AI personal assistant. ' luna")
+wishMe()
+
+
+
+def username():
+	speak("What should i call you sir")
+	uname = takeCommand()
+	speak("Welcome Mister")
+	speak(uname)
+	columns = shutil.get_terminal_size().columns
+	
+	print("#####################".center(columns))
+	print("Welcome Mr.", uname.center(columns))
+	print("#####################".center(columns))
+	
+	speak("How can i Help you, Sir")
+
+def takeCommand():
+	
+	r = sr.Recognizer()
+	
+	with sr.Microphone() as source:
+		
+		print("Listening...")
+		r.pause_threshold = 1
+		audio = r.listen(source)
+
+	try:
+		print("Recognizing...")
+		query = r.recognize_google(audio, language ='en-in')
+		print(f"User said: {query}\n")
+
+	except Exception as e:
+		print(e)
+		print("Unable to Recognize your voice.")
+		return "None"
+	
+	return query
+
+def sendEmail(to, content):
+	server = smtplib.SMTP('smtp.gmail.com', 587)
+	server.ehlo()
+	server.starttls()
+	
+	# Enable low security in gmail
+	server.login('your email id', 'your email password')
+	server.sendmail('your email id', to, content)
+	server.close()
+
+
+
+
+if __name__=='__main__':
+
+
+    while True:
+        speak(" ok . 'Tell me how can I help you now?")
+        statement = takeCommand().lower()
+        if statement==0:
+            continue
+            if "good bye" in statement or "ok bye" in statement or "stop" in statement:
+             speak('your personal assistant FRIDAY is shutting down,Good bye')
+            print('your personal assistant FRIDAY is shutting down,Good bye')
+            break 
+        if 'wikipedia' in statement:
+            speak('Searching Wikipedia...')
+            statement =statement.replace("wikipedia", "")
+            results = wikipedia.summary(statement, sentences=3)
+            speak("According to Wikipedia")
+            print(results)
+            speak(results)
+            
+        elif 'open youtube' in statement:
+            webbrowser.open_new_tab("https://www.youtube.com")
+            speak("youtube is open now")
+            time.sleep(15)
+
+        elif 'open google' in statement:
+            webbrowser.open_new_tab("https://www.google.com")
+            speak("Google chrome is open now")
+            time.sleep(15)
+
+        elif 'open notepad' in statement:
+            webbrowser. open_new_tab("https://www.rapidtables.com/tools/notepad.html")
+            speak("opening notepad online")
+            time.sleep(15)
+
+
+
+        elif ' the room and tell detail 'in statement:
+             speak("here are two persons on this florr. ' door is open.' a chair is near the bed . ' i can see behind camera. '")
+
+        elif 'open gmail' in statement:
+            webbrowser.open_new_tab("gmail.com")
+            speak("Google Mail open now")
+            time.sleep(15)
+
+        elif 'hello luna' in statement:
+            speak("hey there . ' how are you. ' may i help you?")
+            time. sleep(10)
+
+        elif 'iam fine' in statement:
+            speak("nice to hear that.' ")
+            time.sleep(5)
+
+        elif 'luna who is the prime minister of india' in statement:
+            speak("mister narendra modi is current pm of india")
+            time.sleep(5)
+
+
+        elif 'say welcome to sir' in statement:
+             speak("hello welcome . ' pradeep sir. ' iam luna")
+
+
+        elif 'is door lock' in statement:
+             speak("yes sir door locked")
+
+  
+
+
+
+
+        elif'time' in statement:
+            strTime=datetime.datetime.now().strftime("%H:%M:%S")
+            speak(f"the time is {strTime}")
+
+
+
+
+        
+
+        
+        elif 'news' in statement:
+            news = webbrowser.open_new_tab("https://timesofindia.indiatimes.com/home/headlines")
+            speak('Here are some headlines from the Times of India,Happy reading')
+            time.sleep(20)
+
+        elif "camera" in statement or "take a photo" in statement:
+            ec.capture(0,"robo camera","img.jpg")
+            
+        elif 'search'  in statement:
+            statement = statement.replace("search", "")
+            webbrowser.open_new_tab(statement)
+            time.sleep(18)	
+            
+        elif 'ask' in statement:
+            speak('I can answer to computational and geographical questions  and what question do you want to ask now')
+            question=takeCommand()
+            app_id="Paste your unique ID here "
+            client = wolframalpha.Client('R2K75H-7ELALHR35X')
+            res = client.query(question)
+            answer = next(res.results).text
+            speak(answer)
+            print(answer)
+
+        elif 'who are you' in statement or 'what can you do' in statement:
+            speak('I am luna version 1 point O your personal assistant. I am programmed by prithvi tiwari  to minor tasks like'
+                  'opening youtube,google chrome, gmail and stackoverflow ,take care of home,home monitoring etc,predict time,take a photo,search wikipedia,predict weather' 
+                  'In different cities, get top headline news from times of india and you can ask me computational or geographical questions too!')
+
+
+        elif "who made you" in statement or "who created you" in statement or "who discovered you" in statement:
+            speak("I was built by prithvi")
+            print("I was built by prithvi")
+
+        
+        elif "weather" in statement:
+            api_key="Apply your unique ID"
+            base_url="https://api.openweathermap.org/data/2.5/weather?"
+            speak("what is the city name")
+            city_name=takeCommand()
+            complete_url=base_url+"appid="+api_key+"&q="+city_name
+            response = requests.get(complete_url)
+            x=response.json()
+            if x["cod"]!="404":
+                y=x["main"]
+                current_temperature = y["temp"]
+                current_humidiy = y["humidity"]
+                z = x["weather"]
+                weather_description = z[0]["description"]
+                speak(" Temperature in kelvin unit is " +
+                      str(current_temperature) +
+                      "\n humidity in percentage is " +
+                      str(current_humidiy) +
+                      "\n description  " +
+                      str(weather_description))
+                print(" Temperature in kelvin unit = " +
+                      str(current_temperature) +
+                      "\n humidity (in percentage) = " +
+                      str(current_humidiy) +
+                      "\n description = " +
+                      str(weather_description))
+        elif "log off" in statement or "sign out" in statement:
+            speak("Ok , your pc will log off in 10 sec make sure you exit from all applications")
+            subprocess.call(["shutdown", "/l"])
+			
+time.sleep(3)
+            
+
+
+import subprocess
+import wolframalpha
+import pyttsx3
+import tkinter
+import json
+import random
+import operator
+import speech_recognition as sr
+import datetime
+import subprocess
+import wolframalpha
+import pyttsx3
+import tkinter
+import json
+import random
+import operator
+import speech_recognition as sr
+import datetime
+import wikipedia
+import webbrowser
+import os
+import winshell
+import pyjokes
+import feedparser
+import smtplib
+import ctypes
+import time
+import requests
+import shutil
+from twilio.rest import Client
+from ecapture import ecapture as ec
+from bs4 import BeautifulSoup
+import win32com.client as wincl
+from urllib.request import urlopen
+
+
+# import required modules
+import requests, json
+
+# Enter your API key here
+api_key = "Your_API_Key"
+
+# base_url variable to store url
+base_url = "http://api.openweathermap.org/data/2.5/weather?"
+
+# Give city name
+city_name = input("Enter city name : ")
+
+# complete_url variable to store
+# complete url address
+complete_url = base_url + "appid=" + api_key + "&q=" + city_name
+
+# get method of requests module
+# return response object
+response = requests.get(complete_url)
+
+# json method of response object
+# convert json format data into
+# python format data
+x = response.json()
+
+# Now x contains list of nested dictionaries
+# Check the value of "cod" key is equal to
+# "404", means city is found otherwise,
+# city is not found
+if x["cod"] != "404":
+
+	# store the value of "main"
+	# key in variable y
+	y = x["main"]
+
+	# store the value corresponding
+	# to the "temp" key of y
+	current_temperature = y["temp"]
+
+	# store the value corresponding
+	# to the "pressure" key of y
+	current_pressure = y["pressure"]
+
+	# store the value corresponding
+	# to the "humidity" key of y
+	current_humidity = y["humidity"]
+
+	# store the value of "weather"
+	# key in variable z
+	z = x["weather"]
+
+	# store the value corresponding
+	# to the "description" key at
+	# the 0th index of z
+	weather_description = z[0]["description"]
+
+	# print following values
+	print(" Temperature (in kelvin unit) = " +
+					str(current_temperature) +
+		"\n atmospheric pressure (in hPa unit) = " +
+					str(current_pressure) +
+		"\n humidity (in percentage) = " +
+					str(current_humidity) +
+		"\n description = " +
+					str(weather_description))
+
+else:
+	print(" City Not Found ")
+
+
+import requests
+import weakref
+import wikipedia
+
+import subprocess
+import wolframalpha
+import pyttsx3
+import tkinter
+import json
+import random
+import operator
+import speech_recognition as sr
+import datetime
+import wikipedia
+import webbrowser
+import os
+import winshell
+import pyjokes
+import feedparser
+import smtplib
+import ctypes
+import time
+import requests
+import shutil
+from twilio.rest import Client
+import progress
+from ecapture import ecapture as ec
+from bs4 import BeautifulSoup
+import win32com.client as wincl
+from urllib.request import urlopen
+
+
+      
+
+
+
+
+        
+
+
+
